@@ -14,6 +14,13 @@ public:
         data = value;
         next = nullptr;
     }
+
+    void show_commit(){
+        cout<<"commit: "<<data<<endl;
+    }
+    void show_branch(){
+        cout<<"branch: "<<data<<endl;
+    }
 };
 
 // Stack class for managing commits using a linked list
@@ -49,6 +56,20 @@ public:
     // Check if the stack is empty
     bool isEmpty() {
         return top == nullptr;  // Returns true if stack is empty
+    }
+
+    // checck All commit
+    void commit_history(){
+        Node* cc = top;
+        while(cc != nullptr){
+            cc->show_commit();
+            cc = cc->next;
+        }
+    }
+
+    // previous commmit added 
+    void top_commit(){
+        top->show_commit();
     }
 };
 
@@ -97,6 +118,30 @@ public:
     bool isEmpty() {
         return front == nullptr;  // Returns true if queue is empty
     }
+
+    // show branch
+    void show_branch(){
+        Node * cc = front;
+        if (isEmpty()){
+            cout<<"No branch !!!"<<endl;
+            return ;
+        }
+
+        if (front ==  rear){
+            front->show_branch();
+            return ;
+        }
+        while(front){
+            cc->show_branch();
+            if(cc->next == rear){
+                cc->next->show_branch();
+                break;
+            }else {
+                cc == cc->next;
+            }
+        }
+    }
+
 };
 
 // Main function for the menu-driven program
@@ -110,9 +155,12 @@ int main() {
         cout << "\nVersion Control System Menu:\n";
         cout << "1. Add Commit\n";
         cout << "2. Revert Latest Commit\n";
-        cout << "3. Add Branch\n";
-        cout << "4. Merge Branch\n";
-        cout << "5. Exit\n";
+        cout << "3. Show all commit\n";
+        cout << "4. previous commit\n";
+        cout << "5. Add Branch\n";
+        cout << "6. Merge Branch\n";
+        cout << "7. show all branch\n";
+        cout << "8. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;  // Get user's choice
 
@@ -130,7 +178,17 @@ int main() {
                 cout << "Reverted commit: " << reverted << endl;
                 break;
             }
-            case 3: {  // Add Branch
+            case 3 : { // showing commit history
+                cout<<"commit history:"<<endl;
+                commitStack.commit_history();
+                break;
+            }
+            case 4 : { // previous commit
+                cout<<"previous commit:"<<endl;
+                commitStack.top_commit();
+                break;
+            }
+            case 5: {  // Add Branch
                 string branch;
                 cout << "Enter branch name: ";
                 cin.ignore();  // Clear the input buffer
@@ -138,18 +196,22 @@ int main() {
                 branchQueue.enqueue(branch);  // Enqueue branch
                 break;
             }
-            case 4: {  // Merge Branch
+            case 6: {  // Merge Branch
                 string merged = branchQueue.dequeue();  // Dequeue branch
                 cout << "Merged branch: " << merged << endl;
                 break;
             }
-            case 5:  // Exit
+            case 7: {  // Show all branch
+                branchQueue.show_branch();
+                break;
+            }
+            case 8:  // Exit
                 cout << "Exiting the version control system." << endl;
                 break;
             default:  // Invalid choice
                 cout << "Invalid choice! Please try again." << endl;
         }
-    } while (choice != 5);  // Continue until user chooses to exit
+    } while (choice != 8);  // Continue until user chooses to exit
 
     return 0;  // End of program
 }
