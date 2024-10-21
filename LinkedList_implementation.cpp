@@ -63,7 +63,7 @@ public:
     Queue(){front = rear = nullptr;}
 
     // Add a branch to the queue
-    void enqueue(const string& branch) {
+    void enqueue(string branch) {
         Node* newNode = new Node(branch);  // Create a new node
         if (rear == nullptr) {
             // If queue is empty, both front and rear are the new node
