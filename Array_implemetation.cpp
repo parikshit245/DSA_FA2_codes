@@ -1,82 +1,153 @@
 #include <iostream>
-#include <cstring>
-#define MAX_SIZE 100    // Maximum size for stack and queue
+#include <string>
+
 using namespace std;
 
-  
+// Node class for linked list (used in both Stack and Queue)
+class Node {
+public:
+    string data;  // Store the commit message or branch name
+    Node* next;   // Pointer to the next node
 
-// Stack class for managing commits
+    // Constructor for creating a node
+    Node(string value){
+        data = value;
+        next = nullptr;
+    }
+
+    void show_commit(){
+        cout<<"commit: "<<data<<endl;
+    }
+    void show_branch(){
+        cout<<"branch: "<<data<<endl;
+    }
+};
+
+// Stack class for managing commits using a linked list
 class Stack {
 private:
-    string commits[MAX_SIZE];  // Array to store commits
-    int top;  // Index for the top of the stack
+    Node* top;  // Pointer to the top of the stack
 
 public:
-    Stack(){top = -1;}  // Initialize stack
+    // Constructor for initializing stack
+    Stack(){top = nullptr;}
 
     // Add a commit to the stack
     void push(string commit) {
-        if (top < MAX_SIZE - 1) {
-            commits[++top] = commit;  // Increment top and add commit
-            cout << "Commit added: " << commit << endl;
-        } else {
-            cout << "Stack overflow! Can't add more commits." << endl;
-        }
+        Node* newNode = new Node(commit);  // Create a new node
+        newNode->next = top;  // Link the new node to the current top
+        top = newNode;  // Update top to the new node
+        cout << "Commit added: " << commit << endl;
     }
 
     // Revert the latest commit
     string pop() {
-        if (top >= 0) {
-            return commits[top--];  // Return the top commit and decrement top
-        } else {
+        if (top == nullptr) {
             return "No commits to revert.";  // No commits available
+        } else {
+            string poppedCommit = top->data;  // Get the commit at the top
+            Node* temp = top;  // Temporarily store the top node
+            top = top->next;  // Move top to the next node
+            delete temp;  // Delete the old top node
+            return poppedCommit;  // Return the popped commit
         }
     }
 
-    // Check if stack is empty
+    // Check if the stack is empty
     bool isEmpty() {
-        return top == -1;  // Returns true if stack is empty
+        return top == nullptr;  // Returns true if stack is empty
+    }
+
+    // checck All commit
+    void commit_history(){
+        Node* cc = top;
+        while(cc != nullptr){
+            cc->show_commit();
+            cc = cc->next;
+        }
+    }
+
+    // previous commmit added 
+    void top_commit(){
+        top->show_commit();
     }
 };
 
-// Queue class for managing branches
+// Queue class for managing branches using a linked list
 class Queue {
 private:
-    string branches[MAX_SIZE];  // Array to store branches
-    int front, rear;  // Indices for front and rear of the queue
+    Node* front;  // Pointer to the front of the queue
+    Node* rear;   // Pointer to the rear of the queue
 
 public:
-    Queue(){front = rear = 0;}  // Initialize queue
+    // Constructor for initializing queue
+    Queue(){front = rear = nullptr;}
 
     // Add a branch to the queue
     void enqueue(string branch) {
-        if (rear < MAX_SIZE) {
-            branches[rear++] = branch;  // Add branch and increment rear
-            cout << "Branch added to queue: " << branch << endl;
+        Node* newNode = new Node(branch);  // Create a new node
+        if (rear == nullptr) {
+            // If queue is empty, both front and rear are the new node
+            front = rear = newNode;
         } else {
-            cout << "Queue overflow! Can't add more branches." << endl;
+            // Link the new node to the rear and update the rear pointer
+            rear->next = newNode;
+            rear = newNode;
         }
+        cout << "Branch added to queue: " << branch << endl;
     }
 
     // Merge the oldest branch
     string dequeue() {
-        if (front < rear) {
-            return branches[front++];  // Return the front branch and increment front
-        } else {
+        if (front == nullptr) {
             return "No branches to merge.";  // No branches available
+        } else {
+            string dequeuedBranch = front->data;  // Get the branch at the front
+            Node* temp = front;  // Temporarily store the front node
+            front = front->next;  // Move front to the next node
+            if (front == nullptr) {
+                // If the queue becomes empty, rear should also be null
+                rear = nullptr;
+            }
+            delete temp;  // Delete the old front node
+            return dequeuedBranch;  // Return the dequeued branch
         }
     }
 
-    // Check if queue is empty
+    // Check if the queue is empty
     bool isEmpty() {
-        return front == rear;  // Returns true if queue is empty
+        return front == nullptr;  // Returns true if queue is empty
     }
+
+    // show branch
+    void show_branch(){
+        Node * cc = front;
+        if (isEmpty()){
+            cout<<"No branch !!!"<<endl;
+            return ;
+        }
+
+        if (front ==  rear){
+            front->show_branch();
+            return ;
+        }
+        while(front){
+            cc->show_branch();
+            if(cc->next == rear){
+                cc->next->show_branch();
+                break;
+            }else {
+                cc == cc->next;
+            }
+        }
+    }
+
 };
 
 // Main function for the menu-driven program
 int main() {
-    Stack commitStack;  // Create commit stack
-    Queue branchQueue;  // Create branch queue
+    Stack commitStack;  // Create commit stack using linked list
+    Queue branchQueue;  // Create branch queue using linked list
     int choice;  // User's choice for menu
 
     // Menu-driven loop
@@ -84,9 +155,12 @@ int main() {
         cout << "\nVersion Control System Menu:\n";
         cout << "1. Add Commit\n";
         cout << "2. Revert Latest Commit\n";
-        cout << "3. Add Branch\n";
-        cout << "4. Merge Branch\n";
-        cout << "5. Exit\n";
+        cout << "3. Show all commit\n";
+        cout << "4. previous commit\n";
+        cout << "5. Add Branch\n";
+        cout << "6. Merge Branch\n";
+        cout << "7. show all branch\n";
+        cout << "8. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;  // Get user's choice
 
@@ -104,7 +178,17 @@ int main() {
                 cout << "Reverted commit: " << reverted << endl;
                 break;
             }
-            case 3: {  // Add Branch
+            case 3 : { // showing commit history
+                cout<<"commit history:"<<endl;
+                commitStack.commit_history();
+                break;
+            }
+            case 4 : { // previous commit
+                cout<<"previous commit:"<<endl;
+                commitStack.top_commit();
+                break;
+            }
+            case 5: {  // Add Branch
                 string branch;
                 cout << "Enter branch name: ";
                 cin.ignore();  // Clear the input buffer
@@ -112,18 +196,22 @@ int main() {
                 branchQueue.enqueue(branch);  // Enqueue branch
                 break;
             }
-            case 4: {  // Merge Branch
+            case 6: {  // Merge Branch
                 string merged = branchQueue.dequeue();  // Dequeue branch
                 cout << "Merged branch: " << merged << endl;
                 break;
             }
-            case 5:  // Exit
+            case 7: {  // Show all branch
+                branchQueue.show_branch();
+                break;
+            }
+            case 8:  // Exit
                 cout << "Exiting the version control system." << endl;
                 break;
             default:  // Invalid choice
                 cout << "Invalid choice! Please try again." << endl;
         }
-    } while (choice != 5);  // Continue until user chooses to exit
+    } while (choice != 8);  // Continue until user chooses to exit
 
     return 0;  // End of program
 }
